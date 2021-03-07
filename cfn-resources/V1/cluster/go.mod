@@ -7,7 +7,6 @@ require (
 	github.com/aws-cloudformation/cloudformation-cli-go-plugin v1.0.3
 	github.com/aws/aws-sdk-go v1.34.19
 	github.com/davecgh/go-spew v1.1.1
-	github.com/mongodb/mongodbatlas-cloudformation-resources v0.1.0
 	github.com/spf13/cast v1.3.1
 	go.mongodb.org/atlas v0.7.2
 )
