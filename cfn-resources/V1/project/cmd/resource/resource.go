@@ -1,122 +1,133 @@
 package resource
 
 import (
-	"errors"
+	"context"
+	"fmt"
+	"log"
 
+	"github.com/422158/mongodbstpatlas-cloudformation-resources/cfn-resources/V1/project/cmd/util"
 	"github.com/aws-cloudformation/cloudformation-cli-go-plugin/cfn/handler"
+	matlasClient "go.mongodb.org/atlas/mongodbatlas"
 )
 
 // Create handles the Create event from the Cloudformation service.
 func Create(req handler.Request, prevModel *Model, currentModel *Model) (handler.ProgressEvent, error) {
-	// Add your code here:
-	// * Make API calls (use req.Session)
-	// * Mutate the model
-	// * Check/set any callback context (req.CallbackContext / response.CallbackContext)
+	client, err := util.CreateMongoDBClient(*currentModel.ApiKeys.PublicKey, *currentModel.ApiKeys.PrivateKey)
+	if err != nil {
+		return handler.ProgressEvent{}, err
+	}
 
-	/*
-	   // Construct a new handler.ProgressEvent and return it
-	   response := handler.ProgressEvent{
-	       OperationStatus: handler.Success,
-	       Message: "Create complete",
-	       ResourceModel: currentModel,
-	   }
+	project, _, err := client.Projects.Create(context.Background(), &matlasClient.Project{
+		Name:  *currentModel.Name,
+		OrgID: *currentModel.OrgId,
+	})
+	if err != nil {
+		return handler.ProgressEvent{}, fmt.Errorf("error creating project: %s", err)
+	}
 
-	   return response, nil
-	*/
+	currentModel.Id = &project.ID
+	currentModel.Created = &project.Created
+	currentModel.ClusterCount = &project.ClusterCount
 
-	// Not implemented, return an empty handler.ProgressEvent
-	// and an error
-	return handler.ProgressEvent{}, errors.New("Not implemented: Create")
+	return handler.ProgressEvent{
+		OperationStatus: handler.Success,
+		Message:         "Create Complete",
+		ResourceModel:   currentModel,
+	}, nil
 }
 
 // Read handles the Read event from the Cloudformation service.
 func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.ProgressEvent, error) {
-	// Add your code here:
-	// * Make API calls (use req.Session)
-	// * Mutate the model
-	// * Check/set any callback context (req.CallbackContext / response.CallbackContext)
+	client, err := util.CreateMongoDBClient(*currentModel.ApiKeys.PublicKey, *currentModel.ApiKeys.PrivateKey)
+	if err != nil {
+		return handler.ProgressEvent{}, err
+	}
 
-	/*
-	   // Construct a new handler.ProgressEvent and return it
-	   response := handler.ProgressEvent{
-	       OperationStatus: handler.Success,
-	       Message: "Read complete",
-	       ResourceModel: currentModel,
-	   }
+	id := *currentModel.Id
+	log.Printf("Looking for project: %s", id)
 
-	   return response, nil
-	*/
+	project, _, err := client.Projects.GetOneProject(context.Background(), id)
+	if err != nil {
+		return handler.ProgressEvent{}, fmt.Errorf("error reading project with id(%s): %s", id, err)
+	}
 
-	// Not implemented, return an empty handler.ProgressEvent
-	// and an error
-	return handler.ProgressEvent{}, errors.New("Not implemented: Read")
+	currentModel.Name = &project.Name
+	currentModel.OrgId = &project.OrgID
+	currentModel.Created = &project.Created
+	currentModel.ClusterCount = &project.ClusterCount
+
+	return handler.ProgressEvent{
+		OperationStatus: handler.Success,
+		Message:         "Read Complete",
+		ResourceModel:   currentModel,
+	}, nil
 }
 
 // Update handles the Update event from the Cloudformation service.
 func Update(req handler.Request, prevModel *Model, currentModel *Model) (handler.ProgressEvent, error) {
-	// Add your code here:
-	// * Make API calls (use req.Session)
-	// * Mutate the model
-	// * Check/set any callback context (req.CallbackContext / response.CallbackContext)
+	// no-op
 
-	/*
-	   // Construct a new handler.ProgressEvent and return it
-	   response := handler.ProgressEvent{
-	       OperationStatus: handler.Success,
-	       Message: "Update complete",
-	       ResourceModel: currentModel,
-	   }
-
-	   return response, nil
-	*/
-
-	// Not implemented, return an empty handler.ProgressEvent
-	// and an error
-	return handler.ProgressEvent{}, errors.New("Not implemented: Update")
+	return handler.ProgressEvent{
+		OperationStatus: handler.Success,
+		Message:         "Update Complete",
+		ResourceModel:   currentModel,
+	}, nil
 }
 
 // Delete handles the Delete event from the Cloudformation service.
 func Delete(req handler.Request, prevModel *Model, currentModel *Model) (handler.ProgressEvent, error) {
-	// Add your code here:
-	// * Make API calls (use req.Session)
-	// * Mutate the model
-	// * Check/set any callback context (req.CallbackContext / response.CallbackContext)
 
-	/*
-	   // Construct a new handler.ProgressEvent and return it
-	   response := handler.ProgressEvent{
-	       OperationStatus: handler.Success,
-	       Message: "Delete complete",
-	       ResourceModel: currentModel,
-	   }
+	client, err := util.CreateMongoDBClient(*currentModel.ApiKeys.PublicKey, *currentModel.ApiKeys.PrivateKey)
+	if err != nil {
+		return handler.ProgressEvent{}, err
+	}
 
-	   return response, nil
-	*/
+	id := *currentModel.Id
+	log.Printf("Deleting project with id(%s)", id)
 
-	// Not implemented, return an empty handler.ProgressEvent
-	// and an error
-	return handler.ProgressEvent{}, errors.New("Not implemented: Delete")
+	_, err = client.Projects.Delete(context.Background(), id)
+	if err != nil {
+		return handler.ProgressEvent{}, fmt.Errorf("error deleting project with id(%s): %s", id, err)
+	}
+
+	return handler.ProgressEvent{
+		OperationStatus: handler.Success,
+		Message:         "Delete Complete",
+		ResourceModel:   currentModel,
+	}, nil
 }
 
 // List handles the List event from the Cloudformation service.
 func List(req handler.Request, prevModel *Model, currentModel *Model) (handler.ProgressEvent, error) {
-	// Add your code here:
-	// * Make API calls (use req.Session)
-	// * Mutate the model
-	// * Check/set any callback context (req.CallbackContext / response.CallbackContext)
+	client, err := util.CreateMongoDBClient(*currentModel.ApiKeys.PublicKey, *currentModel.ApiKeys.PrivateKey)
+	if err != nil {
+		return handler.ProgressEvent{}, err
+	}
 
-	/*
-	   // Construct a new handler.ProgressEvent and return it
-	   response := handler.ProgressEvent{
-	       OperationStatus: handler.Success,
-	       Message: "List complete",
-	       ResourceModel: currentModel,
-	   }
+	listOptions := &matlasClient.ListOptions{
+		PageNum:      0,
+		ItemsPerPage: 100,
+	}
+	projects, _, err := client.Projects.GetAllProjects(context.Background(), listOptions)
+	if err != nil {
+		return handler.ProgressEvent{}, fmt.Errorf("error retrieving projects: %s", err)
+	}
 
-	   return response, nil
-	*/
+	var models []Model
+	for _, project := range projects.Results {
+		var m Model
+		m.Name = &project.Name
+		m.OrgId = &project.OrgID
+		m.Created = &project.Created
+		m.ClusterCount = &project.ClusterCount
+		m.Id = &project.ID
 
-	// Not implemented, return an empty handler.ProgressEvent
-	// and an error
-	return handler.ProgressEvent{}, errors.New("Not implemented: List")
+		models = append(models, m)
+	}
+
+	return handler.ProgressEvent{
+		OperationStatus: handler.Success,
+		Message:         "List Complete",
+		ResourceModel:   models,
+	}, nil
 }
