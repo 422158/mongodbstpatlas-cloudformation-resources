@@ -1,6 +1,6 @@
 # MongoDB::StpAtlasV1::Cluster
 
-An example resource schema demonstrating some basic constructs and validation rules.
+The cluster resource provides access to your cluster configurations. The resource lets you create, edit and delete clusters. The resource requires your Project ID.
 
 ## Syntax
 
