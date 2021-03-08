@@ -2,6 +2,7 @@ package resource
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/422158/mongodbstpatlas-cloudformation-resources/cfn-resources/V1/network-container/cmd/util"
@@ -93,8 +94,8 @@ func Update(req handler.Request, prevModel *Model, currentModel *Model) (handler
 		return handler.ProgressEvent{}, err
 	}
 
-	projectId := *currentModel.ProjectId
-	containerId := *currentModel.Id
+	projectID := *currentModel.ProjectId
+	containerID := *currentModel.Id
 	containerRequest := &matlasClient.Container{}
 	providerName := currentModel.ProviderName
 	if providerName == nil || *providerName == "" {
@@ -107,9 +108,10 @@ func Update(req handler.Request, prevModel *Model, currentModel *Model) (handler
 	}
 	containerRequest.ProviderName = *providerName
 	containerRequest.RegionName = *currentModel.RegionName
-	containerResponse, _, err := client.Containers.Update(context.Background(), projectId, containerId, containerRequest)
+	containerResponse, _, err := client.Containers.Update(context.Background(), projectID, containerID, containerRequest)
 	if err != nil {
-		return handler.ProgressEvent{}, fmt.Errorf("error updating container with id(project: %s, container: %s): %s", projectId, containerRequest, err)
+		formattedContainerRequest, _ := json.Marshal(&containerRequest)
+		return handler.ProgressEvent{}, fmt.Errorf("error updating container with id(project: %s, container: %s): %s", projectID, string(formattedContainerRequest), err)
 	}
 
 	currentModel.Id = &containerResponse.ID
@@ -128,12 +130,12 @@ func Delete(req handler.Request, prevModel *Model, currentModel *Model) (handler
 		return handler.ProgressEvent{}, err
 	}
 
-	projectId := *currentModel.ProjectId
-	containerId := *currentModel.Id
+	projectID := *currentModel.ProjectId
+	containerID := *currentModel.Id
 
-	_, err = client.Containers.Delete(context.Background(), projectId, containerId)
+	_, err = client.Containers.Delete(context.Background(), projectID, containerID)
 	if err != nil {
-		return handler.ProgressEvent{}, fmt.Errorf("error deleting container with id(project: %s, container: %s): %s", projectId, containerId, err)
+		return handler.ProgressEvent{}, fmt.Errorf("error deleting container with id(project: %s, container: %s): %s", projectID, containerID, err)
 	}
 
 	return handler.ProgressEvent{
@@ -150,12 +152,12 @@ func List(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 		return handler.ProgressEvent{}, err
 	}
 
-	projectId := *currentModel.ProjectId
+	projectID := *currentModel.ProjectId
 	containerRequest := &matlasClient.ContainersListOptions{
 		ProviderName: *currentModel.ProviderName,
 		ListOptions:  matlasClient.ListOptions{},
 	}
-	containerResponse, _, err := client.Containers.List(context.Background(), projectId, containerRequest)
+	containerResponse, _, err := client.Containers.List(context.Background(), projectID, containerRequest)
 	var models []Model
 	for _, container := range containerResponse {
 		var model Model
