@@ -69,7 +69,7 @@ def check_subversion_existence(s3_client, bucket_name, major_version, subversion
     response = s3_client.list_objects_v2(
         Bucket=bucket_name, Prefix=full_version_prefix)
     print(json.dumps(response, indent=2, default=str))
-    if (not 'Contents' in response) or (len(response['Contents']) > 0):
+    if ('Contents' in response) and (len(response['Contents']) > 0):
         print('Prefix {} already exists in bucket {}'.format(
             full_version_prefix, bucket_name))
         return True
