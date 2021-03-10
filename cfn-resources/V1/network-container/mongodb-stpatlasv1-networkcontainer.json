@@ -34,7 +34,7 @@
       "type": "string"
     },
     "VpcId": {
-      "description": "Unique identifier of the peer VPC.",
+      "description": "Unique identifier of the projects VPC.",
       "type": "string"
     },
     "AtlasCidrBlock": {
@@ -51,7 +51,11 @@
   },
   "additionalProperties": false,
   "required": ["ProjectId", "AtlasCidrBlock", "RegionName", "ApiKeys"],
-  "readOnlyProperties": ["/properties/Id"],
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/Provisioned",
+    "/properties/VpcId"
+  ],
   "primaryIdentifier": ["/properties/Id"],
   "handlers": {
     "create": {

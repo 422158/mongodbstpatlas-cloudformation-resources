@@ -49,6 +49,9 @@ func Create(req handler.Request, prevModel *Model, currentModel *Model) (handler
 	}
 
 	currentModel.Id = &containerResponse.ID
+	currentModel.VpcId = &containerResponse.VPCID
+	currentModel.Provisioned = containerResponse.Provisioned
+	currentModel.AtlasCidrBlock = &containerResponse.AtlasCIDRBlock
 
 	return handler.ProgressEvent{
 		OperationStatus: handler.Success,
