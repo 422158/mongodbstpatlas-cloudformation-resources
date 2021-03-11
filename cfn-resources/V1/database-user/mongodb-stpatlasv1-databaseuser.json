@@ -6,11 +6,11 @@
     "labelDefinition": {
       "type": "object",
       "properties": {
-        "key": {
+        "Key": {
           "type": "string",
           "minLength": 1
         },
-        "value": {
+        "Value": {
           "type": "string",
           "minLength": 1
         }
@@ -20,11 +20,11 @@
     "scopeDefinition": {
       "type": "object",
       "properties": {
-        "type": {
+        "Type": {
           "type": "string",
           "enum": ["CLUSTER", "DATA_LAKE"]
         },
-        "name": {
+        "Name": {
           "type": "string"
         }
       },
@@ -34,13 +34,13 @@
     "roleDefinition": {
       "type": "object",
       "properties": {
-        "collectionName": {
+        "CollectionName": {
           "type": "string"
         },
-        "databaseName": {
+        "DatabaseName": {
           "type": "string"
         },
-        "roleName": {
+        "RoleName": {
           "type": "string",
           "minLength": 1
         }
