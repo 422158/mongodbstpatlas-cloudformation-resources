@@ -36,7 +36,7 @@
       },
       "additionalProperties": false
     },
-    "RegionsConfig": {
+    "RegionConfig": {
       "type": "object",
       "properties": {
         "RegionName": {
@@ -57,6 +57,12 @@
       },
       "additionalProperties": false
     },
+    "RegionConfigArr": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/RegionConfig"
+      }
+    },
     "ReplicationSpec": {
       "type": "object",
       "properties": {
@@ -67,10 +73,7 @@
           "type": "integer"
         },
         "RegionsConfig": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RegionsConfig"
-          }
+          "$ref": "#/definitions/RegionConfigArr"
         },
         "ZoneName": {
           "type": "string"

@@ -359,7 +359,7 @@ func expandReplicationSpecs(replicationSpecs []ReplicationSpec) []mongodbatlas.R
 	return rSpecs
 }
 
-func expandRegionsConfig(regions []RegionsConfig) map[string]mongodbatlas.RegionsConfig {
+func expandRegionsConfig(regions []RegionConfig) map[string]mongodbatlas.RegionsConfig {
 	regionsConfig := make(map[string]mongodbatlas.RegionsConfig)
 	for _, region := range regions {
 		regionsConfig[*region.RegionName] = mongodbatlas.RegionsConfig{
@@ -393,11 +393,11 @@ func flattenReplicationSpecs(rSpecs []mongodbatlas.ReplicationSpec) []Replicatio
 	return specs
 }
 
-func flattenRegionsConfig(regionsConfig map[string]mongodbatlas.RegionsConfig) []RegionsConfig {
-	regions := make([]RegionsConfig, 0)
+func flattenRegionsConfig(regionsConfig map[string]mongodbatlas.RegionsConfig) []RegionConfig {
+	regions := make([]RegionConfig, 0)
 
 	for regionName, regionConfig := range regionsConfig {
-		region := RegionsConfig{
+		region := RegionConfig{
 			RegionName:     &regionName,
 			Priority:       castNO64(regionConfig.Priority),
 			AnalyticsNodes: castNO64(regionConfig.AnalyticsNodes),
