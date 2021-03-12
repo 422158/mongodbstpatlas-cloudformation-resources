@@ -24,6 +24,18 @@
       },
       "additionalProperties": false
     },
+    "AutoScalingCompute": {
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "ScaleDownEnabled": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
     "RegionsConfig": {
       "type": "object",
       "properties": {
@@ -104,18 +116,7 @@
     "AutoScaling": {
       "type": "object",
       "properties": {
-        "Compute": {
-          "type": "object",
-          "properties": {
-            "Enabled": {
-              "type": "boolean"
-            },
-            "ScaleDownEnabled": {
-              "type": "boolean"
-            }
-          },
-          "additionalProperties": false
-        },
+        "Compute": { "$ref": "#/definitions/AutoScalingCompute" },
         "DiskGBEnabled": {
           "type": "boolean"
         }

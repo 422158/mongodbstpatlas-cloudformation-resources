@@ -1,4 +1,4 @@
-# MongoDB::StpAtlasV1::Cluster AutoScaling
+# MongoDB::StpAtlasV1::Cluster AutoScalingCompute
 
 ## Syntax
 
@@ -8,29 +8,29 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "<a href="#compute" title="Compute">Compute</a>" : <i><a href="autoscalingcompute.md">AutoScalingCompute</a></i>,
-    "<a href="#diskgbenabled" title="DiskGBEnabled">DiskGBEnabled</a>" : <i>Boolean</i>
+    "<a href="#enabled" title="Enabled">Enabled</a>" : <i>Boolean</i>,
+    "<a href="#scaledownenabled" title="ScaleDownEnabled">ScaleDownEnabled</a>" : <i>Boolean</i>
 }
 </pre>
 
 ### YAML
 
 <pre>
-<a href="#compute" title="Compute">Compute</a>: <i><a href="autoscalingcompute.md">AutoScalingCompute</a></i>
-<a href="#diskgbenabled" title="DiskGBEnabled">DiskGBEnabled</a>: <i>Boolean</i>
+<a href="#enabled" title="Enabled">Enabled</a>: <i>Boolean</i>
+<a href="#scaledownenabled" title="ScaleDownEnabled">ScaleDownEnabled</a>: <i>Boolean</i>
 </pre>
 
 ## Properties
 
-#### Compute
+#### Enabled
 
 _Required_: No
 
-_Type_: <a href="autoscalingcompute.md">AutoScalingCompute</a>
+_Type_: Boolean
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### DiskGBEnabled
+#### ScaleDownEnabled
 
 _Required_: No
 
