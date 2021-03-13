@@ -24,7 +24,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 #### Type
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
@@ -34,7 +34,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### Name
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 

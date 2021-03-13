@@ -29,7 +29,7 @@
         }
       },
       "additionalProperties": false,
-      "required": ["type", "name"]
+      "required": ["Type", "Name"]
     },
     "roleDefinition": {
       "type": "object",
