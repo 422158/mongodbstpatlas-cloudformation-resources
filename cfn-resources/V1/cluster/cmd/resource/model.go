@@ -26,7 +26,6 @@ type Model struct {
 	PitEnabled               *bool              `json:",omitempty"`
 	ProviderBackupEnabled    *bool              `json:",omitempty"`
 	ProviderSettings         *ProviderSettings  `json:",omitempty"`
-	ReplicationFactor        *int               `json:",omitempty"`
 	ReplicationSpecs         []ReplicationSpec  `json:",omitempty"`
 	SrvAddress               *string            `json:",omitempty"`
 	StateName                *string            `json:",omitempty"`

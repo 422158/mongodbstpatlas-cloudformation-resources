@@ -257,10 +257,6 @@
       },
       "additionalProperties": false
     },
-    "ReplicationFactor": {
-      "description": "ReplicationFactor is deprecated. Use replicationSpecs.",
-      "type": "integer"
-    },
     "ReplicationSpecs": {
       "description": "Configuration for cluster regions.",
       "type": "array",

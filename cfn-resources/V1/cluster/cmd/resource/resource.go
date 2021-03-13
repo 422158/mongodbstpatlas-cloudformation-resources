@@ -46,7 +46,6 @@ func getClusterRequest(model *Model) *mongodbatlas.Cluster {
 		BiConnector:              expandBiConnector(model.BiConnector),
 		ProviderSettings:         expandProviderSettings(model.ProviderSettings),
 		ReplicationSpecs:         expandReplicationSpecs(model.ReplicationSpecs),
-		ReplicationFactor:        cast64(model.ReplicationFactor),
 		NumShards:                cast64(model.NumShards),
 	}
 
@@ -91,7 +90,6 @@ func Create(req handler.Request, prevModel *Model, currentModel *Model) (handler
 		EncryptionAtRestProvider: cast.ToString(currentModel.EncryptionAtRestProvider),
 		ClusterType:              cast.ToString(currentModel.ClusterType),
 		AutoScaling:              autoScaling,
-		ReplicationFactor:        cast64(currentModel.ReplicationFactor),
 		NumShards:                cast64(currentModel.NumShards),
 	}
 
@@ -198,6 +196,7 @@ func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 	if cluster.ProviderSettings != nil {
 		currentModel.ProviderSettings = &ProviderSettings{
 			BackingProviderName: &cluster.ProviderSettings.BackingProviderName,
+			ProviderName:        &cluster.ProviderSettings.ProviderName,
 			DiskIOPS:            castNO64(cluster.ProviderSettings.DiskIOPS),
 			EncryptEBSVolume:    cluster.ProviderSettings.EncryptEBSVolume,
 			InstanceSizeName:    &cluster.ProviderSettings.InstanceSizeName,
@@ -207,7 +206,6 @@ func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 	}
 
 	currentModel.ReplicationSpecs = flattenReplicationSpecs(cluster.ReplicationSpecs)
-	currentModel.ReplicationFactor = castNO64(cluster.ReplicationFactor)
 
 	return handler.ProgressEvent{
 		OperationStatus: handler.Success,
@@ -255,7 +253,6 @@ func Update(req handler.Request, prevModel *Model, currentModel *Model) (handler
 		BiConnector:              expandBiConnector(currentModel.BiConnector),
 		ProviderSettings:         expandProviderSettings(currentModel.ProviderSettings),
 		ReplicationSpecs:         expandReplicationSpecs(currentModel.ReplicationSpecs),
-		ReplicationFactor:        cast64(currentModel.ReplicationFactor),
 		NumShards:                cast64(currentModel.NumShards),
 	}
 
@@ -333,7 +330,7 @@ func expandProviderSettings(providerSettings *ProviderSettings) *mongodbatlas.Pr
 		RegionName:          cast.ToString(providerSettings.RegionName),
 		BackingProviderName: cast.ToString(providerSettings.BackingProviderName),
 		InstanceSizeName:    cast.ToString(providerSettings.InstanceSizeName),
-		ProviderName:        "AWS",
+		ProviderName:        cast.ToString(providerSettings.ProviderName),
 		VolumeType:          cast.ToString(providerSettings.VolumeType),
 	}
 	if providerSettings.DiskIOPS != nil {
