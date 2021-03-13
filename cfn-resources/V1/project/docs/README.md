@@ -35,7 +35,7 @@ Properties:
 
 Name of the project to create.
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 

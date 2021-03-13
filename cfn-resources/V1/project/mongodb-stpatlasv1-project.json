@@ -43,7 +43,7 @@
     }
   },
   "additionalProperties": false,
-  "required": ["Properties", "OrgId"],
+  "required": ["Name", "OrgId"],
   "readOnlyProperties": [
     "/properties/Id",
     "/properties/Created",
