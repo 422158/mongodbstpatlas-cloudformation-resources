@@ -244,6 +244,10 @@ Current state of the cluster.
 
 Connection string for connecting to the Atlas cluster. The +srv modifier forces the connection to use TLS. The mongoURI parameter lists additional options.
 
+#### ConnectionStrings
+
+Returns the <code>ConnectionStrings</code> value.
+
 #### Paused
 
 Flag that indicates whether the cluster is paused or not.

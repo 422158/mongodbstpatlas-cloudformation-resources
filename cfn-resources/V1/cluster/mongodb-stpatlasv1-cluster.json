@@ -278,6 +278,7 @@
   "readOnlyProperties": [
     "/properties/StateName",
     "/properties/SrvAddress",
+    "/properties/ConnectionStrings",
     "/properties/Paused",
     "/properties/MongoDBVersion",
     "/properties/MongoURI",
