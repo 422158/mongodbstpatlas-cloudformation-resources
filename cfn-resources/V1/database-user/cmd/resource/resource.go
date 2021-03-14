@@ -110,7 +110,6 @@ func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 		return handler.ProgressEvent{}, fmt.Errorf("error fetching database user (%s): %s", username, err)
 	}
 
-	currentModel.DatabaseName = &databaseUser.Username
 	currentModel.LdapAuthType = &databaseUser.LDAPAuthType
 	currentModel.AwsIAMType = &databaseUser.AWSIAMType
 

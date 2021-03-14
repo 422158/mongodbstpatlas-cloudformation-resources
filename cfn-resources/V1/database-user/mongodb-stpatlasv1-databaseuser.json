@@ -124,6 +124,7 @@
   },
   "additionalProperties": false,
   "required": ["DatabaseName", "ProjectId", "Roles", "Username"],
+  "writeOnlyProperties": ["/properties/Password"],
   "readOnlyProperties": ["/properties/UserCNFIdentifier"],
   "primaryIdentifier": ["/properties/UserCNFIdentifier"],
   "handlers": {
