@@ -234,13 +234,13 @@ Current state of the cluster.
 
 Connection string for connecting to the Atlas cluster. The +srv modifier forces the connection to use TLS. The mongoURI parameter lists additional options.
 
-#### PublicConnectionString
+#### ConnectionString
 
-Connection strings that your applications uses to connect to this cluster through internet.
+Connection strings that your applications uses to connect to this cluster. Legacy form of address
 
-#### PrivateConnectionString
+#### SrvConnectionString
 
-Connection strings that your applications uses to connect to this cluster through vpc peering.
+Connection strings that your applications uses to connect to this cluster. Srv form of address
 
 #### Paused
 

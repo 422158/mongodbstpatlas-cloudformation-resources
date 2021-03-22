@@ -150,12 +150,12 @@
       "description": "Type of the cluster that you want to create.",
       "type": "string"
     },
-    "PublicConnectionString": {
-      "description": "Connection strings that your applications uses to connect to this cluster through internet.",
+    "SrvConnectionString": {
+      "description": "Connection strings that your applications uses to connect to this cluster. Srv form of address",
       "type": "string"
     },
-    "PrivateConnectionString": {
-      "description": "Connection strings that your applications uses to connect to this cluster through vpc peering.",
+    "ConnectionString": {
+      "description": "Connection strings that your applications uses to connect to this cluster. Legacy form of address",
       "type": "string"
     },
     "DiskSizeGB": {
@@ -286,8 +286,8 @@
   "readOnlyProperties": [
     "/properties/StateName",
     "/properties/SrvAddress",
-    "/properties/PublicConnectionString",
-    "/properties/PrivateConnectionString",
+    "/properties/ConnectionString",
+    "/properties/SrvConnectionString",
     "/properties/Paused",
     "/properties/MongoDBVersion",
     "/properties/MongoURI",

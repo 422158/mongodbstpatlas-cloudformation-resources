@@ -10,8 +10,8 @@ type Model struct {
 	BackupEnabled            *bool             `json:",omitempty"`
 	BiConnector              *BiConnector      `json:",omitempty"`
 	ClusterType              *string           `json:",omitempty"`
-	PublicConnectionString   *string           `json:",omitempty"`
-	PrivateConnectionString  *string           `json:",omitempty"`
+	SrvConnectionString      *string           `json:",omitempty"`
+	ConnectionString         *string           `json:",omitempty"`
 	DiskSizeGB               *float64          `json:",omitempty"`
 	EncryptionAtRestProvider *string           `json:",omitempty"`
 	ProjectId                *string           `json:",omitempty"`

@@ -204,10 +204,10 @@ func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 	currentModel.StateName = &cluster.StateName
 
 	if &cluster.ConnectionStrings.PrivateSrv != nil {
-		currentModel.PrivateConnectionString = &cluster.ConnectionStrings.PrivateSrv
+		currentModel.ConnectionString = &cluster.ConnectionStrings.Standard
 	}
 	if &cluster.ConnectionStrings.StandardSrv != nil {
-		currentModel.PublicConnectionString = &cluster.ConnectionStrings.StandardSrv
+		currentModel.SrvConnectionString = &cluster.ConnectionStrings.StandardSrv
 	}
 
 	currentModel.BiConnector = &BiConnector{
