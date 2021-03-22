@@ -360,7 +360,7 @@ func Delete(req handler.Request, prevModel *Model, currentModel *Model) (handler
 	_, err = client.Clusters.Delete(context.Background(), projectID, clusterName)
 	if err != nil {
 		// even when error occurs when deleting, we still want to delete parameter from parameter store
-		_, errParams := deleteParameterFromParameterStore(currentModel.Id, req.Session)
+		_, errParams := deleteParameterFromParameterStore(currentModel.ClusterCfnIdentifier, req.Session)
 		if errParams != nil {
 			return handler.ProgressEvent{
 				OperationStatus:  handler.Failed,
