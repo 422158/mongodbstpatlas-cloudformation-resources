@@ -7,5 +7,8 @@ require (
 	github.com/aws-cloudformation/cloudformation-cli-go-plugin v1.0.3
 	github.com/aws/aws-sdk-go v1.34.19
 	github.com/davecgh/go-spew v1.1.1
+	github.com/google/go-cmp v0.5.4 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	go.mongodb.org/atlas v0.7.2
+
 )

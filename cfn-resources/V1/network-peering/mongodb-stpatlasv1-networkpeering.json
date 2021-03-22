@@ -67,24 +67,26 @@
   },
   "additionalProperties": false,
   "required": ["ProjectId", "ContainerId", "ApiKeys"],
+  "writeOnlyProperties": ["/properties/ApiKeys"],
   "readOnlyProperties": [
     "/properties/Id",
     "/properties/StatusName",
-    "/properties/ErrorStateName"
+    "/properties/ErrorStateName",
+    "/properties/ConnectionId"
   ],
   "primaryIdentifier": ["/properties/Id"],
   "handlers": {
     "create": {
-      "permissions": [""]
+      "permissions": ["ssm:PutParameter"]
     },
     "read": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter"]
     },
     "update": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter", "ssm:PutParameter"]
     },
     "delete": {
-      "permissions": [""]
+      "permissions": ["ssm:DeleteParameter", "ssm:GetParameter"]
     },
     "list": {
       "permissions": [""]

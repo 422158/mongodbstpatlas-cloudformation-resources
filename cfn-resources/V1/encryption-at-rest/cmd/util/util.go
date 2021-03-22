@@ -2,6 +2,8 @@ package util
 
 import (
 	"github.com/Sectorbob/mlab-ns2/gae/ns/digest"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ssm"
 	"go.mongodb.org/atlas/mongodbatlas"
 )
 
@@ -23,4 +25,9 @@ func CreateMongoDBClient(publicKey, privateKey string) (*mongodbatlas.Client, er
 	atlas := mongodbatlas.NewClient(client)
 	atlas.UserAgent = "mongodbatlas-cloudformation-resources/" + Version
 	return atlas, nil
+}
+
+func CreateSSMClient(session *session.Session) (*ssm.SSM, error) {
+	ssmCli := ssm.New(session)
+	return ssmCli, nil
 }

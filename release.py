@@ -8,6 +8,8 @@ import copy
 import subprocess
 
 PRODUCTION_BUCKET_NAME = 'stacktape-infrastructure-modules'
+BUCKET_KEY_PREFIX = 'atlasMongo'
+ROLE_DEFINITION_FILE_NAME = 'resource-role.yaml'
 
 
 def rewrite_file_content(file_handler, new_content):
@@ -65,7 +67,8 @@ def build_resource_package(relative_path_to_resource_directory, subversion):
 def check_subversion_existence(s3_client, bucket_name, major_version, subversion):
     if len(subversion) != 7 or not subversion.isnumeric():
         raise Exception('Invalid format of subversion {}'.format(subversion))
-    full_version_prefix = 'atlasMongo/{}/{}'.format(major_version, subversion)
+    full_version_prefix = '{}/{}/{}'.format(
+        BUCKET_KEY_PREFIX, major_version, subversion)
     response = s3_client.list_objects_v2(
         Bucket=bucket_name, Prefix=full_version_prefix)
     print(json.dumps(response, indent=2, default=str))
@@ -77,7 +80,8 @@ def check_subversion_existence(s3_client, bucket_name, major_version, subversion
 
 
 def upload_resource_package(relative_path_to_resource_directory, s3_client, bucket_name, major_version, subversion):
-    full_version_prefix = 'atlasMongo/{}/{}'.format(major_version, subversion)
+    full_version_prefix = '{}/{}/{}'.format(
+        BUCKET_KEY_PREFIX, major_version, subversion)
     zip_files = [f for f in listdir(
         relative_path_to_resource_directory) if f.endswith('.zip')]
     # find json file (its name). only one should be present
@@ -88,7 +92,14 @@ def upload_resource_package(relative_path_to_resource_directory, s3_client, buck
         zip_files[0], bucket_name, full_version_prefix, zip_files[0]))
     s3_client.upload_file(Filename='{}/{}'.format(relative_path_to_resource_directory,
                                                   zip_files[0]), Bucket=bucket_name, Key='{}/{}'.format(full_version_prefix, zip_files[0]))
-    print('upload success')
+    print('package upload success')
+    role_definition_bucket_key = '{}/{}-role.yml'.format(
+        full_version_prefix, zip_files[0].split('.')[0])
+    print('uploading {} into {}/{}'.format(
+        ROLE_DEFINITION_FILE_NAME, bucket_name, role_definition_bucket_key))
+    s3_client.upload_file(Filename='{}/{}'.format(relative_path_to_resource_directory,
+                                                  ROLE_DEFINITION_FILE_NAME), Bucket=bucket_name, Key=role_definition_bucket_key)
+    print('uploading role definition success')
 
 
 def resolve_resource_packages_for_major_version(s3_client, bucket_name, major_version, subversion):
@@ -117,8 +128,8 @@ subversion_exists = check_subversion_existence(
     s3_client=s3, bucket_name=args['bucket_name'], major_version=args['major_version'], subversion=args['subversion'])
 
 if subversion_exists and args['bucket_name'] == PRODUCTION_BUCKET_NAME:
-    raise Exception('atlasMongo/{}/{} already exists in production bucket. You CANNOT override version in production bucket'.format(
-        args['major_version'], args['subversion']))
+    raise Exception('{}/{}/{} already exists in production bucket. You CANNOT override version in production bucket'.format(
+        BUCKET_KEY_PREFIX, args['major_version'], args['subversion']))
 
 resolve_resource_packages_for_major_version(
     s3_client=s3, bucket_name=args['bucket_name'], major_version=args['major_version'], subversion=args['subversion'])

@@ -2,11 +2,16 @@ package resource
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"log"
+	"net/url"
+	"strings"
 
 	"github.com/422158/mongodbstpatlas-cloudformation-resources/cfn-resources/V1/database-user/cmd/util"
 	"github.com/aws-cloudformation/cloudformation-cli-go-plugin/cfn/handler"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ssm"
+	"github.com/davecgh/go-spew/spew"
 	"go.mongodb.org/atlas/mongodbatlas"
 )
 
@@ -78,14 +83,18 @@ func Create(req handler.Request, prevModel *Model, currentModel *Model) (handler
 		user.LDAPAuthType = *currentModel.LdapAuthType
 	}
 
-	log.Printf("Arguments: Project ID: %s, Request %#+v", groupID, &user)
-	cfnid := fmt.Sprintf("%s-%s", user.GroupID, user.Username)
-	currentModel.UserCNFIdentifier = &cfnid
-	log.Printf("UserCFNIdentifier: %s", cfnid)
+	cfnid := buildUserCfnIdentifier(currentModel.ProjectId, currentModel.Username)
+	currentModel.UserCfnIdentifier = &cfnid
 
 	_, _, err = client.DatabaseUsers.Create(context.Background(), groupID, &user)
 	if err != nil {
 		return handler.ProgressEvent{}, fmt.Errorf("error creating database user: %s", err)
+	}
+
+	// putting api keys and project name into parameter store (needed for read operation)
+	_, err = putParameterIntoParameterStore(currentModel.UserCfnIdentifier, &ParameterToBePersistedSpec{ApiKeys: currentModel.ApiKeys, ProjectId: currentModel.ProjectId, Username: currentModel.Username, DatabaseName: currentModel.DatabaseName}, req.Session)
+	if err != nil {
+		return handler.ProgressEvent{}, fmt.Errorf("error when putting api keys into parameter store: %s", err)
 	}
 
 	return handler.ProgressEvent{
@@ -97,17 +106,19 @@ func Create(req handler.Request, prevModel *Model, currentModel *Model) (handler
 
 // Read handles the Read event from the Cloudformation service.
 func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.ProgressEvent, error) {
-	client, err := util.CreateMongoDBClient(*currentModel.ApiKeys.PublicKey, *currentModel.ApiKeys.PrivateKey)
+	params, err := getParameterFromParameterStore(currentModel.UserCfnIdentifier, req.Session)
 	if err != nil {
 		return handler.ProgressEvent{}, err
 	}
 
-	groupID := *currentModel.ProjectId
-	username := *currentModel.Username
-	dbName := *currentModel.DatabaseName
-	databaseUser, _, err := client.DatabaseUsers.Get(context.Background(), dbName, groupID, username)
+	client, err := util.CreateMongoDBClient(*params.ApiKeys.PublicKey, *params.ApiKeys.PrivateKey)
 	if err != nil {
-		return handler.ProgressEvent{}, fmt.Errorf("error fetching database user (%s): %s", username, err)
+		return handler.ProgressEvent{}, err
+	}
+
+	databaseUser, _, err := client.DatabaseUsers.Get(context.Background(), *params.DatabaseName, *params.ProjectId, *params.Username)
+	if err != nil {
+		return handler.ProgressEvent{}, fmt.Errorf("error fetching database user (%s): %s", *params.Username, err)
 	}
 
 	currentModel.LdapAuthType = &databaseUser.LDAPAuthType
@@ -151,7 +162,7 @@ func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 	currentModel.Labels = labels
 
 	cfnid := fmt.Sprintf("%s-%s", *currentModel.ProjectId, *currentModel.Username)
-	currentModel.UserCNFIdentifier = &cfnid
+	currentModel.UserCfnIdentifier = &cfnid
 
 	return handler.ProgressEvent{
 		OperationStatus: handler.Success,
@@ -231,6 +242,14 @@ func Update(req handler.Request, prevModel *Model, currentModel *Model) (handler
 		return handler.ProgressEvent{}, fmt.Errorf("error updating database user (%s): %s", username, err)
 	}
 
+	currentModel.UserCfnIdentifier = prevModel.UserCfnIdentifier
+
+	// putting api keys and project name into parameter store (needed for read operation)
+	_, err = putParameterIntoParameterStore(currentModel.UserCfnIdentifier, &ParameterToBePersistedSpec{ApiKeys: currentModel.ApiKeys, ProjectId: currentModel.ProjectId, Username: currentModel.Username, DatabaseName: currentModel.DatabaseName}, req.Session)
+	if err != nil {
+		return handler.ProgressEvent{}, fmt.Errorf("error when putting api keys into parameter store: %s", err)
+	}
+
 	return handler.ProgressEvent{
 		OperationStatus: handler.Success,
 		Message:         "Update Complete",
@@ -246,12 +265,45 @@ func Delete(req handler.Request, prevModel *Model, currentModel *Model) (handler
 	}
 
 	groupID := *currentModel.ProjectId
-	username := *currentModel.Username
+	username := url.QueryEscape(*currentModel.Username)
 	dbName := *currentModel.DatabaseName
 
-	_, err = client.DatabaseUsers.Delete(context.Background(), dbName, groupID, username)
-	if err != nil {
-		return handler.ProgressEvent{}, fmt.Errorf("error deleting database user (%s): %s", username, err)
+	resp, err := client.DatabaseUsers.Delete(context.Background(), dbName, groupID, username)
+	userDeletedSuccess := true
+	if err != nil || resp.StatusCode != 204 {
+		userDeletedSuccess = false
+		// if resp.StatusCode == 404 {
+		// 	userDeletedSuccess = true
+		// }
+	}
+
+	_, respErr := deleteParameterFromParameterStore(currentModel.UserCfnIdentifier, req.Session)
+	parameterDeletedSuccess := true
+	if respErr != nil {
+		parameterDeletedSuccess = false
+	}
+
+	if !userDeletedSuccess && !parameterDeletedSuccess {
+		return handler.ProgressEvent{
+			OperationStatus:  handler.Failed,
+			Message:          "Delete Failed",
+			HandlerErrorCode: "GeneralServiceException",
+		}, fmt.Errorf("Failed to delete both user and parameter from store for user %s\n%s\n%s", *currentModel.UserCfnIdentifier, err, respErr)
+	}
+	if !userDeletedSuccess {
+		// bytes, err := httputil.DumpResponse(resp.Response, true)
+		return handler.ProgressEvent{
+			OperationStatus:  handler.Failed,
+			Message:          "Delete Failed",
+			HandlerErrorCode: "GeneralServiceException",
+		}, fmt.Errorf("Failed to delete user with id %s\n%s\nResponse:%s", *currentModel.UserCfnIdentifier, err, spew.Sprint(resp))
+	}
+	if !parameterDeletedSuccess {
+		return handler.ProgressEvent{
+			OperationStatus:  handler.Failed,
+			Message:          "Delete Failed",
+			HandlerErrorCode: "GeneralServiceException",
+		}, fmt.Errorf("Failed to delete parameter for user with id %s\n%s", *currentModel.UserCfnIdentifier, respErr)
 	}
 
 	return handler.ProgressEvent{
@@ -269,4 +321,80 @@ func List(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 		Message:         "List Complete",
 		ResourceModel:   currentModel,
 	}, nil
+}
+
+func buildUserCfnIdentifier(projectId *string, userName *string) string {
+	cfnid := fmt.Sprintf("%s-%s-%s", "user", strings.ToLower(strings.Replace(strings.Replace(*userName, ":", "", -1), "/", "_", -1)), *projectId)
+	return cfnid
+}
+
+type ParameterToBePersistedSpec struct {
+	ApiKeys      *ApiKeyDefinition
+	ProjectId    *string
+	Username     *string
+	DatabaseName *string
+}
+
+func putParameterIntoParameterStore(resourcePrimaryIdentifier *string, params *ParameterToBePersistedSpec, session *session.Session) (*ssm.PutParameterOutput, error) {
+	ssmClient, err := util.CreateSSMClient(session)
+	if err != nil {
+		return nil, err
+	}
+	// transform api keys to json string
+	parameterName := buildApiKeyParameterName(*resourcePrimaryIdentifier)
+	byteParams, err := json.Marshal(params)
+	if err != nil {
+		return nil, err
+	}
+	stringifiedParams := string(byteParams)
+	parameterType := "SecureString"
+	overwrite := true
+	putParamOutput, err := ssmClient.PutParameter(&ssm.PutParameterInput{Name: &parameterName, Value: &stringifiedParams, Type: &parameterType, Overwrite: &overwrite})
+	if err != nil {
+		return nil, fmt.Errorf("Unable to put parameter %s: %s", parameterName, err)
+	}
+
+	return putParamOutput, nil
+}
+
+func deleteParameterFromParameterStore(resourcePrimaryIdentifier *string, session *session.Session) (*ssm.DeleteParameterOutput, error) {
+	ssmClient, err := util.CreateSSMClient(session)
+	if err != nil {
+		return nil, err
+	}
+	parameterName := buildApiKeyParameterName(*resourcePrimaryIdentifier)
+
+	deleteParamOutput, err := ssmClient.DeleteParameter(&ssm.DeleteParameterInput{Name: &parameterName})
+	if err != nil {
+		return nil, err
+	}
+
+	return deleteParamOutput, nil
+}
+
+func getParameterFromParameterStore(resourcePrimaryIdentifier *string, session *session.Session) (*ParameterToBePersistedSpec, error) {
+	ssmClient, err := util.CreateSSMClient(session)
+	if err != nil {
+		return nil, err
+	}
+	parameterName := buildApiKeyParameterName(*resourcePrimaryIdentifier)
+	decrypt := true
+	getParamOutput, err := ssmClient.GetParameter(&ssm.GetParameterInput{Name: &parameterName, WithDecryption: &decrypt})
+	if err != nil {
+		return nil, err
+	}
+
+	var params ParameterToBePersistedSpec
+	err = json.Unmarshal([]byte(*getParamOutput.Parameter.Value), &params)
+	if err != nil {
+		return nil, err
+	}
+	return &params, nil
+}
+
+func buildApiKeyParameterName(resourcePrimaryIdentifier string) string {
+	// this is strictly coupled with permissions for handlers, changing this means changing permissions in handler
+	// moreover changing this might cause polution in parameter store -  be sure you know what you are doing
+	parameterStorePrefix := "mongodbstpatlasv1databaseuser"
+	return fmt.Sprintf("%s-%s", parameterStorePrefix, resourcePrimaryIdentifier)
 }

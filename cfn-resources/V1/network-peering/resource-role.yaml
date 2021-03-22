@@ -21,9 +21,11 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Effect: Deny
+              - Effect: Allow
                 Action:
-                - "*"
+                - "ssm:DeleteParameter"
+                - "ssm:GetParameter"
+                - "ssm:PutParameter"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

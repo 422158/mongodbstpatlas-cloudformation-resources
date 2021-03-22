@@ -126,6 +126,10 @@
       },
       "additionalProperties": false
     },
+    "ClusterCfnIdentifier": {
+      "description": "Identifier of the cluster. It is derived from cluster name, but it is readonly property",
+      "type": "string"
+    },
     "BackupEnabled": {
       "description": "Applicable only for M10+ clusters. Set to true to enable Atlas continuous backups for the cluster. Set to false to disable continuous backups for the cluster. Atlas deletes any stored snapshots. See the continuous backup Snapshot Schedule for more information. You cannot enable continuous backups if you have an existing cluster in the project with Cloud Provider Snapshots enabled. The default value is false.",
       "type": "boolean"
@@ -146,9 +150,13 @@
       "description": "Type of the cluster that you want to create.",
       "type": "string"
     },
-    "ConnectionStrings": {
-      "description": "Set of connection strings that your applications use to connect to this cluster. Use the parameters in this object to connect your applications to this cluster. See the MongoDB [Connection String URI Format](https://docs.mongodb.com/manual/reference/connection-string/) reference for further details.",
-      "$ref": "#/definitions/connectionStrings"
+    "PublicConnectionString": {
+      "description": "Connection strings that your applications uses to connect to this cluster through internet.",
+      "type": "string"
+    },
+    "PrivateConnectionString": {
+      "description": "Connection strings that your applications uses to connect to this cluster through vpc peering.",
+      "type": "string"
     },
     "DiskSizeGB": {
       "description": "Capacity, in gigabytes, of the host’s root volume. Increase this number to add capacity, up to a maximum possible value of 4096 (i.e., 4 TB). This value must be a positive integer.",
@@ -278,28 +286,30 @@
   "readOnlyProperties": [
     "/properties/StateName",
     "/properties/SrvAddress",
-    "/properties/ConnectionStrings",
+    "/properties/PublicConnectionString",
+    "/properties/PrivateConnectionString",
     "/properties/Paused",
     "/properties/MongoDBVersion",
     "/properties/MongoURI",
     "/properties/MongoURIUpdated",
     "/properties/MongoURIWithOptions",
-    "/properties/Id"
+    "/properties/Id",
+    "/properties/ClusterCfnIdentifier"
   ],
-  "writeOnlyProperties": ["/properties/ApiKeys", "/properties/ProjectId"],
-  "primaryIdentifier": ["/properties/Id"],
+  "writeOnlyProperties": ["/properties/ApiKeys"],
+  "primaryIdentifier": ["/properties/ClusterCfnIdentifier"],
   "handlers": {
     "create": {
-      "permissions": []
+      "permissions": ["ssm:PutParameter"]
     },
     "read": {
-      "permissions": []
+      "permissions": ["ssm:GetParameter"]
     },
     "update": {
-      "permissions": []
+      "permissions": ["ssm:GetParameter", "ssm:PutParameter"]
     },
     "delete": {
-      "permissions": []
+      "permissions": ["ssm:DeleteParameter", "ssm:GetParameter"]
     }
   }
 }

@@ -61,28 +61,25 @@
     },
     "ApiKeys": {
       "$ref": "#/definitions/apiKeyDefinition"
-    },
-    "TotalCount": {
-      "description": "The unique identifier for the Project API AccessList rules.",
-      "type": "integer"
     }
   },
   "additionalProperties": false,
   "required": ["ProjectId", "AccessList", "ApiKeys"],
-  "readOnlyProperties": ["/properties/Id", "/properties/TotalCount"],
+  "createOnlyProperties": ["/properties/ProjectId"],
+  "readOnlyProperties": ["/properties/Id"],
   "primaryIdentifier": ["/properties/Id"],
   "handlers": {
     "create": {
-      "permissions": [""]
+      "permissions": ["ssm:PutParameter"]
     },
     "read": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter"]
     },
     "update": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter", "ssm:PutParameter"]
     },
     "delete": {
-      "permissions": [""]
+      "permissions": ["ssm:DeleteParameter", "ssm:GetParameter"]
     },
     "list": {
       "permissions": [""]

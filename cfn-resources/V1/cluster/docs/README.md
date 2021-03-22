@@ -17,7 +17,6 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#backupenabled" title="BackupEnabled">BackupEnabled</a>" : <i>Boolean</i>,
         "<a href="#biconnector" title="BiConnector">BiConnector</a>" : <i><a href="biconnector.md">BiConnector</a></i>,
         "<a href="#clustertype" title="ClusterType">ClusterType</a>" : <i>String</i>,
-        "<a href="#connectionstrings" title="ConnectionStrings">ConnectionStrings</a>" : <i><a href="connectionstrings.md">connectionStrings</a></i>,
         "<a href="#disksizegb" title="DiskSizeGB">DiskSizeGB</a>" : <i>Double</i>,
         "<a href="#encryptionatrestprovider" title="EncryptionAtRestProvider">EncryptionAtRestProvider</a>" : <i>String</i>,
         "<a href="#projectid" title="ProjectId">ProjectId</a>" : <i>String</i>,
@@ -43,7 +42,6 @@ Properties:
     <a href="#backupenabled" title="BackupEnabled">BackupEnabled</a>: <i>Boolean</i>
     <a href="#biconnector" title="BiConnector">BiConnector</a>: <i><a href="biconnector.md">BiConnector</a></i>
     <a href="#clustertype" title="ClusterType">ClusterType</a>: <i>String</i>
-    <a href="#connectionstrings" title="ConnectionStrings">ConnectionStrings</a>: <i><a href="connectionstrings.md">connectionStrings</a></i>
     <a href="#disksizegb" title="DiskSizeGB">DiskSizeGB</a>: <i>Double</i>
     <a href="#encryptionatrestprovider" title="EncryptionAtRestProvider">EncryptionAtRestProvider</a>: <i>String</i>
     <a href="#projectid" title="ProjectId">ProjectId</a>: <i>String</i>
@@ -103,14 +101,6 @@ Type of the cluster that you want to create.
 _Required_: No
 
 _Type_: String
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### ConnectionStrings
-
-_Required_: No
-
-_Type_: <a href="connectionstrings.md">connectionStrings</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -228,7 +218,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 ### Ref
 
-When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the Id.
+When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the ClusterCfnIdentifier.
 
 ### Fn::GetAtt
 
@@ -244,9 +234,13 @@ Current state of the cluster.
 
 Connection string for connecting to the Atlas cluster. The +srv modifier forces the connection to use TLS. The mongoURI parameter lists additional options.
 
-#### ConnectionStrings
+#### PublicConnectionString
 
-Returns the <code>ConnectionStrings</code> value.
+Connection strings that your applications uses to connect to this cluster through internet.
+
+#### PrivateConnectionString
+
+Connection strings that your applications uses to connect to this cluster through vpc peering.
 
 #### Paused
 
@@ -271,4 +265,8 @@ connection string for connecting to the Atlas cluster. Includes the replicaSet, 
 #### Id
 
 Unique identifier of the cluster.
+
+#### ClusterCfnIdentifier
+
+Identifier of the cluster. It is derived from cluster name, but it is readonly property
 

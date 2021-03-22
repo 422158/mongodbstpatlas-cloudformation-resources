@@ -19,7 +19,6 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#providername" title="ProviderName">ProviderName</a>" : <i>String</i>,
         "<a href="#routetablecidrblock" title="RouteTableCidrBlock">RouteTableCidrBlock</a>" : <i>String</i>,
         "<a href="#vpcid" title="VpcId">VpcId</a>" : <i>String</i>,
-        "<a href="#connectionid" title="ConnectionId">ConnectionId</a>" : <i>String</i>,
         "<a href="#apikeys" title="ApiKeys">ApiKeys</a>" : <i><a href="apikeydefinition.md">apiKeyDefinition</a></i>
     }
 }
@@ -37,7 +36,6 @@ Properties:
     <a href="#providername" title="ProviderName">ProviderName</a>: <i>String</i>
     <a href="#routetablecidrblock" title="RouteTableCidrBlock">RouteTableCidrBlock</a>: <i>String</i>
     <a href="#vpcid" title="VpcId">VpcId</a>: <i>String</i>
-    <a href="#connectionid" title="ConnectionId">ConnectionId</a>: <i>String</i>
     <a href="#apikeys" title="ApiKeys">ApiKeys</a>: <i><a href="apikeydefinition.md">apiKeyDefinition</a></i>
 </pre>
 
@@ -113,16 +111,6 @@ _Type_: String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### ConnectionId
-
-Unique identifier for the peering connection.
-
-_Required_: No
-
-_Type_: String
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
 #### ApiKeys
 
 _Required_: Yes
@@ -154,4 +142,8 @@ The VPC peering connection status
 #### ErrorStateName
 
 Error state, if any.
+
+#### ConnectionId
+
+Unique identifier for the peering connection.
 

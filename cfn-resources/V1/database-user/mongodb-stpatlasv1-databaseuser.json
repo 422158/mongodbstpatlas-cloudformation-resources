@@ -114,7 +114,7 @@
       "description": "Username for authenticating to MongoDB.",
       "type": "string"
     },
-    "UserCNFIdentifier": {
+    "UserCfnIdentifier": {
       "description": "A unique identifier comprised of the Atlas Project ID and Username",
       "type": "string"
     },
@@ -125,23 +125,25 @@
   "additionalProperties": false,
   "required": ["DatabaseName", "ProjectId", "Roles", "Username"],
   "writeOnlyProperties": ["/properties/Password"],
-  "readOnlyProperties": ["/properties/UserCNFIdentifier"],
-  "primaryIdentifier": ["/properties/UserCNFIdentifier"],
+  "createOnlyProperties": [
+    "/properties/Username",
+    "/properties/DatabaseName",
+    "/properties/ProjectId"
+  ],
+  "readOnlyProperties": ["/properties/UserCfnIdentifier"],
+  "primaryIdentifier": ["/properties/UserCfnIdentifier"],
   "handlers": {
     "create": {
-      "permissions": [""]
+      "permissions": ["ssm:PutParameter"]
     },
     "read": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter"]
     },
     "update": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter", "ssm:PutParameter"]
     },
     "delete": {
-      "permissions": [""]
-    },
-    "list": {
-      "permissions": [""]
+      "permissions": ["ssm:DeleteParameter", "ssm:GetParameter"]
     }
   }
 }

@@ -13,7 +13,7 @@ type Model struct {
 	Scopes            []ScopeDefinition `json:",omitempty"`
 	Password          *string           `json:",omitempty"`
 	Username          *string           `json:",omitempty"`
-	UserCNFIdentifier *string           `json:",omitempty"`
+	UserCfnIdentifier *string           `json:",omitempty"`
 	ApiKeys           *ApiKeyDefinition `json:",omitempty"`
 }
 

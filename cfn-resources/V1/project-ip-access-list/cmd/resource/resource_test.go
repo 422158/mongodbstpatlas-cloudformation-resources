@@ -29,7 +29,6 @@ var (
 func new() *Model {
 	comment := "Testing ip whitelist"
 	ipaddress := "192.168.0.1"
-	count := 1
 	model := &Model{
 		ProjectId: &projectID,
 		AccessList: []AccessListEntryDefinition{
@@ -43,7 +42,6 @@ func new() *Model {
 			PublicKey:  &publicKey,
 			PrivateKey: &privateKey,
 		},
-		TotalCount: &count,
 	}
 	spew.Dump(model)
 	return model

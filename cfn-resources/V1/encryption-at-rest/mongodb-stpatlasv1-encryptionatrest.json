@@ -44,6 +44,10 @@
     }
   },
   "properties": {
+    "CfnPrimaryIdentifier": {
+      "type": "string",
+      "description": "Encryption at rest resource identifier based of projectId"
+    },
     "AwsKms": {
       "$ref": "#/definitions/AwsKms"
     },
@@ -57,22 +61,20 @@
   },
   "additionalProperties": false,
   "required": ["AwsKms", "ProjectId"],
-  "primaryIdentifier": ["/properties/ProjectId"],
+  "readOnlyProperties": ["/properties/CfnPrimaryIdentifier"],
+  "primaryIdentifier": ["/properties/CfnPrimaryIdentifier"],
   "handlers": {
     "create": {
-      "permissions": [""]
+      "permissions": ["ssm:PutParameter"]
     },
     "read": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter"]
     },
     "update": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter", "ssm:PutParameter"]
     },
     "delete": {
-      "permissions": [""]
-    },
-    "list": {
-      "permissions": [""]
+      "permissions": ["ssm:DeleteParameter", "ssm:GetParameter"]
     }
   }
 }

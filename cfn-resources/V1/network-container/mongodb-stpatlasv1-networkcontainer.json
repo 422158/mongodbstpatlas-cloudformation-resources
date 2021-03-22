@@ -50,7 +50,13 @@
     }
   },
   "additionalProperties": false,
-  "required": ["ProjectId", "AtlasCidrBlock", "RegionName", "ApiKeys"],
+  "required": [
+    "ProjectId",
+    "AtlasCidrBlock",
+    "RegionName",
+    "ApiKeys",
+    "ProviderName"
+  ],
   "readOnlyProperties": [
     "/properties/Id",
     "/properties/Provisioned",
@@ -59,19 +65,16 @@
   "primaryIdentifier": ["/properties/Id"],
   "handlers": {
     "create": {
-      "permissions": [""]
+      "permissions": ["ssm:PutParameter"]
     },
     "read": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter"]
     },
     "update": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter", "ssm:PutParameter"]
     },
     "delete": {
-      "permissions": [""]
-    },
-    "list": {
-      "permissions": [""]
+      "permissions": ["ssm:DeleteParameter", "ssm:GetParameter"]
     }
   }
 }

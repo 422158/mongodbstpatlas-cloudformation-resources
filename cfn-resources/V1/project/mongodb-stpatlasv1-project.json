@@ -52,19 +52,13 @@
   "primaryIdentifier": ["/properties/Id"],
   "handlers": {
     "create": {
-      "permissions": [""]
+      "permissions": ["ssm:PutParameter"]
     },
     "read": {
-      "permissions": [""]
-    },
-    "update": {
-      "permissions": [""]
+      "permissions": ["ssm:GetParameter"]
     },
     "delete": {
-      "permissions": [""]
-    },
-    "list": {
-      "permissions": [""]
+      "permissions": ["ssm:DeleteParameter", "ssm:GetParameter"]
     }
   }
 }
