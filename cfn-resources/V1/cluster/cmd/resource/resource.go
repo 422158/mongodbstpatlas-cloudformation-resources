@@ -86,6 +86,17 @@ func Create(req handler.Request, prevModel *Model, currentModel *Model) (handler
 		autoScaling = &mongodbatlas.AutoScaling{
 			DiskGBEnabled: currentModel.AutoScaling.DiskGBEnabled,
 		}
+		if currentModel.AutoScaling.Compute != nil {
+			compute := &mongodbatlas.Compute{}
+			if currentModel.AutoScaling.Compute.Enabled != nil {
+				compute.Enabled = currentModel.AutoScaling.Compute.Enabled
+			}
+			if currentModel.AutoScaling.Compute.ScaleDownEnabled != nil {
+				compute.ScaleDownEnabled = currentModel.AutoScaling.Compute.ScaleDownEnabled
+			}
+
+			autoScaling.Compute = compute
+		}
 	}
 
 	clusterRequest := &mongodbatlas.Cluster{
@@ -217,24 +228,18 @@ func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 
 	currentModel.Id = &cluster.ID
 
-	// currentModel.ConnectionStrings = &ConnectionStrings{
-	// 	Standard:    &cluster.ConnectionStrings.Standard,
-	// 	StandardSrv: &cluster.ConnectionStrings.StandardSrv,
-	// 	Private:     &cluster.ConnectionStrings.Private,
-	// 	PrivateSrv:  &cluster.ConnectionStrings.PrivateSrv,
-	//AwsPrivateLink:         &cluster.ConnectionStrings.AwsPrivateLink,
-	//AwsPrivateLinkSrv:      &cluster.ConnectionStrings.AwsPrivateLinkSrv,
-	// }
-
 	if cluster.ProviderSettings != nil {
 		currentModel.ProviderSettings = &ProviderSettings{
 			BackingProviderName: &cluster.ProviderSettings.BackingProviderName,
 			ProviderName:        &cluster.ProviderSettings.ProviderName,
-			// DiskIOPS:            castNO64(cluster.ProviderSettings.DiskIOPS),
-			// EncryptEBSVolume:    cluster.ProviderSettings.EncryptEBSVolume,
+			AutoScaling: &AutoScalingProvider{
+				Compute: &AutoScalingProviderCompute{
+					MinInstanceSize: &cluster.ProviderSettings.AutoScaling.Compute.MinInstanceSize,
+					MaxInstanceSize: &cluster.ProviderSettings.AutoScaling.Compute.MaxInstanceSize,
+				},
+			},
 			InstanceSizeName: &cluster.ProviderSettings.InstanceSizeName,
 			RegionName:       &cluster.ProviderSettings.RegionName,
-			// VolumeType:          &cluster.ProviderSettings.VolumeType,
 		}
 	}
 
@@ -275,6 +280,17 @@ func Update(req handler.Request, prevModel *Model, currentModel *Model) (handler
 	if currentModel.AutoScaling != nil {
 		autoScaling = &mongodbatlas.AutoScaling{
 			DiskGBEnabled: currentModel.AutoScaling.DiskGBEnabled,
+		}
+		if currentModel.AutoScaling.Compute != nil {
+			compute := &mongodbatlas.Compute{}
+			if currentModel.AutoScaling.Compute.Enabled != nil {
+				compute.Enabled = currentModel.AutoScaling.Compute.Enabled
+			}
+			if currentModel.AutoScaling.Compute.ScaleDownEnabled != nil {
+				compute.ScaleDownEnabled = currentModel.AutoScaling.Compute.ScaleDownEnabled
+			}
+
+			autoScaling.Compute = compute
 		}
 	}
 
@@ -419,6 +435,17 @@ func expandProviderSettings(providerSettings *ProviderSettings) *mongodbatlas.Pr
 		InstanceSizeName:    cast.ToString(providerSettings.InstanceSizeName),
 		ProviderName:        cast.ToString(providerSettings.ProviderName),
 		VolumeType:          cast.ToString(providerSettings.VolumeType),
+	}
+	if providerSettings.AutoScaling != nil {
+		if providerSettings.AutoScaling.Compute != nil {
+			ps.AutoScaling = &mongodbatlas.AutoScaling{Compute: &mongodbatlas.Compute{}}
+			if providerSettings.AutoScaling.Compute.MaxInstanceSize != nil {
+				ps.AutoScaling.Compute.MaxInstanceSize = *providerSettings.AutoScaling.Compute.MaxInstanceSize
+			}
+			if providerSettings.AutoScaling.Compute.MinInstanceSize != nil {
+				ps.AutoScaling.Compute.MinInstanceSize = *providerSettings.AutoScaling.Compute.MinInstanceSize
+			}
+		}
 	}
 	if providerSettings.DiskIOPS != nil {
 		ps.DiskIOPS = cast64(providerSettings.DiskIOPS)
