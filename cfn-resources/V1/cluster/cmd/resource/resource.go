@@ -81,6 +81,10 @@ func Create(req handler.Request, prevModel *Model, currentModel *Model) (handler
 		clusterRequest.ProviderBackupEnabled = currentModel.ProviderBackupEnabled
 	}
 
+	if currentModel.PitEnabled != nil {
+		clusterRequest.PitEnabled = currentModel.PitEnabled
+	}
+
 	if currentModel.DiskSizeGB != nil {
 		clusterRequest.DiskSizeGB = currentModel.DiskSizeGB
 	}
@@ -156,6 +160,7 @@ func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 	}
 
 	currentModel.BackupEnabled = cluster.BackupEnabled
+	currentModel.PitEnabled = cluster.PitEnabled
 
 	currentModel.BiConnector = &BiConnector{
 		ReadPreference: &cluster.BiConnector.ReadPreference,
@@ -274,6 +279,10 @@ func Update(req handler.Request, prevModel *Model, currentModel *Model) (handler
 
 	if currentModel.ProviderBackupEnabled != nil {
 		clusterRequest.ProviderBackupEnabled = currentModel.ProviderBackupEnabled
+	}
+
+	if currentModel.PitEnabled != nil {
+		clusterRequest.PitEnabled = currentModel.PitEnabled
 	}
 
 	if currentModel.DiskSizeGB != nil {
