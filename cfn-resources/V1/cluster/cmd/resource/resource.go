@@ -171,7 +171,7 @@ func Read(req handler.Request, prevModel *Model, currentModel *Model) (handler.P
 	currentModel.ClusterType = &cluster.ClusterType
 	currentModel.DiskSizeGB = cluster.DiskSizeGB
 	currentModel.EncryptionAtRestProvider = &cluster.EncryptionAtRestProvider
-	currentModel.MongoDBMajorVersion = &cluster.MongoDBVersion
+	currentModel.MongoDBMajorVersion = &cluster.MongoDBMajorVersion
 
 	if cluster.NumShards != nil {
 		currentModel.NumShards = castNO64(cluster.NumShards)
@@ -236,6 +236,32 @@ func Update(req handler.Request, prevModel *Model, currentModel *Model) (handler
 
 	projectID := *currentModel.ProjectId
 	clusterName := *currentModel.Name
+
+	currentClusterInfo, _, err := client.Clusters.Get(context.Background(), projectID, clusterName)
+	if err != nil {
+		return handler.ProgressEvent{}, fmt.Errorf("error fetching cluster info (%s): %s", clusterName, err)
+	}
+
+	preUpdateClusterSize := currentClusterInfo.ProviderSettings.InstanceSizeName
+	desiredClusterSize := *currentModel.ProviderSettings.InstanceSizeName
+
+	if preUpdateClusterSize == "M2" || preUpdateClusterSize == "M5" {
+		if desiredClusterSize != preUpdateClusterSize {
+			return handler.ProgressEvent{
+				OperationStatus:  handler.Failed,
+				Message:          "Update Failed",
+				HandlerErrorCode: "GeneralServiceException",
+			}, fmt.Errorf("Error updating cluster with name \"%s\": You cannot update cluster tier of SHARED tier (M2, M5) clusters.", clusterName)
+		}
+		// if cluster is SHARED tier, we simply complete without invoking update API (as it is forbidden by Atlas)
+		// this "silent" completion without performing UPDATE operation, should not cause problem
+		// this is to avoid errors when i.e. tags are added cloudformation stack and update of the cluster is triggered
+		return handler.ProgressEvent{
+			OperationStatus: handler.Success,
+			Message:         "Complete",
+			ResourceModel:   currentModel,
+		}, nil
+	}
 
 	if len(currentModel.ReplicationSpecs) > 0 {
 		if currentModel.ClusterType != nil {

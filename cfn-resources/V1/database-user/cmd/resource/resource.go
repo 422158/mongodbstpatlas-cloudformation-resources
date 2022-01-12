@@ -236,7 +236,7 @@ func Update(req handler.Request, prevModel *Model, currentModel *Model) (handler
 		user.LDAPAuthType = *currentModel.LdapAuthType
 	}
 
-	_, _, err = client.DatabaseUsers.Update(context.Background(), groupID, username,
+	_, _, err = client.DatabaseUsers.Update(context.Background(), groupID, url.QueryEscape(username),
 		&user)
 	if err != nil {
 		return handler.ProgressEvent{}, fmt.Errorf("error updating database user (%s): %s", username, err)
